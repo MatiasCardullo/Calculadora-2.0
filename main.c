@@ -2,14 +2,15 @@
 #include <stdlib.h>
 #include <conio.h>
 
-void validar(char*);
+int validar(char*);
 int potencia(int,int);
 
 int main(){
     int seguir=0;
+    system("mode con cols=60 lines=30");
+    system("title Calculadora 2.0");
     while(seguir!=27){
-        system("mode con cols=60 lines=30");
-        system("title Calculadora 2.0");
+        system("cls");
         char* puntero;
         char input[100];
         puntero=&input[0];
@@ -19,8 +20,11 @@ int main(){
         for(int i=0;i<=50;i++){auxNums[i]=0;}
         printf("____________________________________________________________\n");
         printf("\tIngrese la operacion:\n\n ");
+        fflush(stdin);
         gets(puntero);
-        validar(puntero);
+        printf("____________________________________________________________\n");
+        if(validar(puntero)<0)
+            {continue;}
         for(int i=0;i<100;i++){
             aux=*(puntero+i)-48;
             if(*(puntero+i)=='-'){
@@ -36,7 +40,6 @@ int main(){
                 //printf("numero %d\n",aux);
                 if(floatFlag){
                     auxNums[numCounter]=auxNums[numCounter]+aux/potencia(10,floatConter);
-                    printf("%.3f",auxNums[numCounter]);
                     floatConter++;
                 }else{
                     auxNums[numCounter]=auxNums[numCounter]*10+aux;
@@ -60,24 +63,42 @@ int main(){
             output=output+auxNums[i];
         }printf("\nEl resultado es %.3f\n",output);
         printf("____________________________________________________________\n");
-        printf("\n\tenter para volver");
+        printf("\tESC para salir\n");
+        fflush(stdin);
         seguir=getch();
-        printf("%d",seguir);
     }return 0;
 }
-void validar(char* puntero){
-    int index=0,flag=0;
+int validar(char* puntero){
+    int index=0,flag=0,errorParentesis=0,errorSintax=0;
     for(int i=0;i<100;i++){
         index=*(puntero+i);
-        if(*(puntero+i)=='\0')
+        if(index=='\0')
             {break;}
+        if(index=='(')
+            {errorParentesis++;}
+        if(index==')')
+            {errorParentesis--;}
+        if(index=='*'||index=='/'){
+            errorSintax++;
+            if(errorSintax>1){
+                if(flag!=-3){
+                    printf("Error de sintaxsis: \"%c%c\"",*(puntero+i-1),index);
+                    flag=-3;
+                }else{printf(", \"%c%c\"",*(puntero+i-1),index);}
+            }
+        }else{errorSintax=0;}
         if(!(index>39&&index<58)){
-            if(flag==0){
+            if(flag!=-1){
                 printf("Error, caracteres invalidos: %c",index);
-                flag=1;
+                flag=-1;
             }else{printf(", %c",index);}
         }
-    }if(flag){printf("\n");system("pause");}
+    }
+    if(errorParentesis!=0)
+            {printf("Error, faltan o sobran parentesis");flag=-2;}
+    if(flag<0)
+        {printf("\n\n");system("pause");}
+    return flag;
 }
 
 int potencia(int numero, int potencia){
