@@ -4,6 +4,8 @@
 int potencia(int,int);
 
 int main(){
+    int seguir=0;
+    while(seguir=10){
     system("mode con cols=60 lines=30");
     system("title Calculadora 2.0");
     char* puntero;
@@ -56,9 +58,10 @@ int main(){
         printf("\nNumero %d: %.3f\n",i+1,auxNums[i]);
         output=output+auxNums[i];
     }printf("El resultado es %.3f\n",output);
-    printf("__________________________________________\n ");
-    system("pause");
-    return 0;
+    printf("____________________________________________________________\n");
+    printf("\n\tenter para seguir");
+    seguir=getchar();
+}return 0;
 }
 
 int potencia(int numero, int potencia){
