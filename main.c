@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <conio.h>
 #include "funciones.h"
 
@@ -11,7 +12,6 @@ int main(){
         system("cls");
         char* pString;
         char input[200];
-        int index;
         pString=&input[0];
         printf("____________________________________________________________\n");
         printf("\tIngrese la operacion:\n\n ");
@@ -20,14 +20,15 @@ int main(){
         printf("____________________________________________________________\n");
         if(validar(pString)<0)
             {continue;}
-        //else if(validar(pString)==0)
-            //{terminos(pString);}
         else if(validar(pString)>0){
-            printf("El resultado es: %s\n",parentesis(pString));
+            float output=calculo2(pString,100);
+            parentesis(pString);
+            printf("%s",pString);
             system("pause");
-        }
-        float output=calculo1(pString,100);
-        printf("El resultado es: %.3f\n",output);
+        }else
+            {printf("\t \\(o_o')/ y que se supone que haga?\n");}
+
+        //printf("El resultado es: %.3f\n",output);
         //system("pause");system("cls");
         printf("____________________________________________________________\n");
         printf("\tESC para salir\n");

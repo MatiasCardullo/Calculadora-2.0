@@ -1,18 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int validar(char* puntero){
-    int index,flag=0,errorSintax=0;
-    int parentesis=0,errorParentesis=0;
+    int index,flag=1,errorSintax=0,errorParentesis=0,nada=0;
     for(int i=0;i<200;i++){
         index=*(puntero+i);
         if(index=='\0')
             {break;}
+        nada=1;
         if(index=='('){
-            parentesis++;
             errorParentesis++;
         }if(index==')'){
-            if(parentesis<=0)
+            if(errorParentesis<=0)
                 {flag=-2;break;}
             errorParentesis--;
         }
@@ -36,8 +36,8 @@ int validar(char* puntero){
             {printf("\n Error, faltan o sobran parentesis");flag=-2;}
     if(flag<0)
         {printf("\n\n ");system("pause");}
-    else if(parentesis>0)
-        {flag=parentesis;}
+    if(!nada)
+        {flag=0;}
     return flag;
 }
 
@@ -49,7 +49,7 @@ int potencia(int numero, int potencia){
     }return resultado;
 }
 
-float calculo1(char* puntero,int largo){
+float calculo2(char* puntero,int largo){
     int negativeFlag=0,numFlag=0,floatFlag=0;
     int numCounter=0,floatConter=0;
     float aux, auxNums[50];
@@ -67,7 +67,6 @@ float calculo1(char* puntero,int largo){
                 }else if(!negativeFlag&&!numFlag){
                     negativeFlag=1;
                 }
-
             }
         }
         else{
@@ -94,45 +93,57 @@ float calculo1(char* puntero,int largo){
     }
     float output=0;
     for(int i=0;i<numCounter;i++){
-        printf("Numero %d: %.3f\n",i+1,auxNums[i]);
+        //printf("Numero %d: %.3f\n",i+1,auxNums[i]);
         output=output+auxNums[i];
     }return output;
 }
 
-char* parentesis(char* puntero){
-    int index,flag=0,largo=0;
-    char* inicio;
-    char* fin;
+void parentesis(char* pStringInicio){
+    int index,flag=0,largoParentesis=0;
+    int largoInicio=0;
+    char* pInicio,* pFin;
+    float output;
     for(int i=0;i<200;i++){
-        index=*(puntero+i);
+        index=*(pStringInicio+i);
+        if(!flag){
+            largoInicio++;
+        }
         if(index==')'){
-            flag=0;largo++;
-            fin=(puntero+i);
+            flag=0;largoParentesis++;
+            pFin=(pStringInicio+i);
             break;
         }
         if(flag)
-            {largo++;}
+            {largoParentesis++;}
         if(index=='('){
-            inicio=(puntero+i);
-            if(flag)
-                {largo=0;}
-            largo++;flag=1;
+            pInicio=(pStringInicio+i);
+            if(flag){
+                largoInicio=largoInicio+largoParentesis;
+                largoParentesis=0;
+            }largoParentesis++;flag=1;
         }
     }
-    char outputS[20];
-    float num=calculo1(inicio,largo);
-    printf("%.3f\n",num);
-    int decimal,entero=num;
-    float aux;
-    //printf("%d\n",entero);
-    for(int i=0;i<10;i++){
-        aux=(num-entero)*potencia(10,i);
-        decimal=aux;
-        if(aux-decimal==0){break;}
+    //printf("%c%.3f%c",*pInicio,output,*pFin);system("pause");
+    char aux[100]={""};
+    char inicio[200]={""};
+    for(int i=0;i<largoInicio-1;i++){
+        sprintf(aux,"%c",*(pStringInicio+i));
+        //printf("%s",aux);system("pause");
+        strcat(inicio,aux);
+        //printf("%s",inicio);system("pause");
     }
-    //printf("%d\n",decimal);
-    sprintf(outputS,"%d.%d",entero,decimal);
-    return &outputS;
+    output=calculo2(pInicio,largoParentesis);
+    sprintf(aux,"%.3f",output);
+    strcat(inicio,aux);
+    for(int i=1;i<200;i++){
+        if(*(pFin+i)=='\0')
+            {break;}
+        sprintf(aux,"%c",*(pFin+i));
+        //printf("%s",aux);system("pause");
+        strcat(inicio,aux);
+        //printf("%s",inicio);system("pause");
+    }
+    strcpy(pStringInicio,inicio);
 }
 
 float terminos(char* puntero){
