@@ -10,4 +10,4 @@ El programa toma una operacion combinada ingresada por el usuario y la resuelve.
  	- ~multiplicacion y division.~
 	- ~potencias y raices.~
 	- ~factoriales.~
-- ~Separa en terminos y resuelve parentesis.~
+- Resuelve parentesis~ y separa en terminos.~ 

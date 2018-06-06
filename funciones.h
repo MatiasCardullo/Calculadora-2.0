@@ -3,12 +3,16 @@
 
 int validar(char*);
 
-void parentesis(char*);
-
-float terminos(char*);
-
 int potencia(int,int);
 
-float calculo2(char*,int);
+float calculoSimple(char*,int);
+
+int parentesis(char*);
+
+void terminos(char*);
+
+
+
+
 
 #endif // FUNCIONES_H_INCLUDED

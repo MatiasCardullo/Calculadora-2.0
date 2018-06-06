@@ -11,7 +11,7 @@ int main(){
     while(seguir!=27){
         system("cls");
         char* pString;
-        char input[200];
+        char input[500];
         pString=&input[0];
         printf("____________________________________________________________\n");
         printf("\tIngrese la operacion:\n\n ");
@@ -21,13 +21,18 @@ int main(){
         if(validar(pString)<0)
             {continue;}
         else if(validar(pString)>0){
-            float output=calculo2(pString,100);
-            parentesis(pString);
-            printf("%s",pString);
-            system("pause");
+            int flag=0,largo=strlen(pString);
+            while(strchr(pString, '(')!=NULL){
+                if(!flag)
+                    {printf("%s",pString);}
+                flag=1;
+                parentesis(pString);
+                printf("\n%s",pString);
+            }if(!flag)
+                {printf("%s",pString);}
+            printf("=%.3f\n",calculoSimple(pString,largo));
         }else
             {printf("\t \\(o_o')/ y que se supone que haga?\n");}
-
         //printf("El resultado es: %.3f\n",output);
         //system("pause");system("cls");
         printf("____________________________________________________________\n");

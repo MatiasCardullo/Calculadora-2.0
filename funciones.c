@@ -49,7 +49,7 @@ int potencia(int numero, int potencia){
     }return resultado;
 }
 
-float calculo2(char* puntero,int largo){
+float calculoSimple(char* puntero,int largo){
     int negativeFlag=0,numFlag=0,floatFlag=0;
     int numCounter=0,floatConter=0;
     float aux, auxNums[50];
@@ -98,9 +98,9 @@ float calculo2(char* puntero,int largo){
     }return output;
 }
 
-void parentesis(char* pStringInicio){
-    int index,flag=0,largoParentesis=0;
-    int largoInicio=0;
+int parentesis(char* pStringInicio){
+    int index,flag=-1,nParentesis=0;
+    int largoInicio=0,largoParentesis=0;
     char* pInicio,* pFin;
     float output;
     for(int i=0;i<200;i++){
@@ -119,34 +119,25 @@ void parentesis(char* pStringInicio){
             pInicio=(pStringInicio+i);
             if(flag){
                 largoInicio=largoInicio+largoParentesis;
+                nParentesis++;
                 largoParentesis=0;
             }largoParentesis++;flag=1;
         }
     }
-    //printf("%c%.3f%c",*pInicio,output,*pFin);system("pause");
-    char aux[100]={""};
-    char inicio[200]={""};
-    for(int i=0;i<largoInicio-1;i++){
-        sprintf(aux,"%c",*(pStringInicio+i));
-        //printf("%s",aux);system("pause");
-        strcat(inicio,aux);
-        //printf("%s",inicio);system("pause");
+    if(flag!=-1){
+        char auxNumber[100]={""};
+        char auxString[200]={""};
+        strncpy(auxString, pStringInicio,largoInicio-nParentesis);//printf("%s\n",auxString);
+        output=calculoSimple(pInicio,largoParentesis);
+        sprintf(auxNumber,"%.3f",output);
+        strcat(auxString,auxNumber);//printf("%s\n",auxString);
+        strcat(auxString,pFin+1);//printf("%s\n",auxString);
+        strcpy(pStringInicio,auxString);
     }
-    output=calculo2(pInicio,largoParentesis);
-    sprintf(aux,"%.3f",output);
-    strcat(inicio,aux);
-    for(int i=1;i<200;i++){
-        if(*(pFin+i)=='\0')
-            {break;}
-        sprintf(aux,"%c",*(pFin+i));
-        //printf("%s",aux);system("pause");
-        strcat(inicio,aux);
-        //printf("%s",inicio);system("pause");
-    }
-    strcpy(pStringInicio,inicio);
+    return flag;
 }
 
-float terminos(char* puntero){
+void terminos(char* puntero){
     for(int i=0;i<200;i++){
 
     }
