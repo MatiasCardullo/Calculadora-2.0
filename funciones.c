@@ -3,17 +3,17 @@
 #include <string.h>
 
 int validar(char* puntero){
-    int index,flag=1,errorSintax=0,errorParentesis=0,nada=0;
+    int index,flag=1,errorSintax=0,errorParentesis=0,nada=1;
     for(int i=0;i<200;i++){
         index=*(puntero+i);
         if(index=='\0')
             {break;}
-        nada=1;
+        nada=0;
         if(index=='('){
             errorParentesis++;
         }if(index==')'){
             if(errorParentesis<=0)
-                {flag=-2;break;}
+                {flag=-2;}
             errorParentesis--;
         }
         if(index=='*'||index=='/'){
@@ -36,17 +36,21 @@ int validar(char* puntero){
             {printf("\n Error, faltan o sobran parentesis");flag=-2;}
     if(flag<0)
         {printf("\n\n ");system("pause");}
-    if(!nada)
+    if(nada)
         {flag=0;}
     return flag;
 }
 
-int potencia(int numero, int potencia){
-    int resultado=1;
+float potencia(float numero, float potencia){
+    float resultado=1;
     if(potencia>0){
         for(int i=0;i<potencia;i++)
             {resultado=resultado*numero;}
-    }return resultado;
+    }else if(potencia<0){
+        for(int i=0;i<potencia;i++)
+            {resultado=resultado/numero;}
+    }
+    return resultado;
 }
 
 float calculoSimple(char* puntero,int largo){
@@ -54,7 +58,7 @@ float calculoSimple(char* puntero,int largo){
     int numCounter=0,floatConter=0;
     float aux, auxNums[50];
     for(int i=0;i<=50;i++){auxNums[i]=0;}
-    for(int i=0;i<largo;i++){
+    for(int i=0;i<largo+1;i++){
         aux=*(puntero+i)-48;
         if(*(puntero+i)=='-'){                                             //marca negativos
             if(negativeFlag&&numFlag){
@@ -75,7 +79,6 @@ float calculoSimple(char* puntero,int largo){
                     auxNums[numCounter]=auxNums[numCounter]+aux/potencia(10,floatConter);
                     floatConter++;
                 }else{
-                    //printf("leo numero\n");
                     auxNums[numCounter]=auxNums[numCounter]*10+aux;
                 }numFlag=1;
             }else if(*(puntero+i)=='.'||*(puntero+i)==','){     //marca decimales
@@ -88,7 +91,7 @@ float calculoSimple(char* puntero,int largo){
                     numCounter++;
                     numFlag=0;floatFlag=0;
                 }
-            }if(*(puntero+i)=='\0'){break;}                   //termina la lectura
+            }
         }
     }
     float output=0;
@@ -99,7 +102,7 @@ float calculoSimple(char* puntero,int largo){
 }
 
 int parentesis(char* pStringInicio){
-    int index,flag=-1,nParentesis=0;
+    int index,flag=-1;
     int largoInicio=0,largoParentesis=0;
     char* pInicio,* pFin;
     float output;
@@ -118,8 +121,7 @@ int parentesis(char* pStringInicio){
         if(index=='('){
             pInicio=(pStringInicio+i);
             if(flag){
-                largoInicio=largoInicio+largoParentesis;
-                nParentesis++;
+                largoInicio=largoInicio+largoParentesis-1;
                 largoParentesis=0;
             }largoParentesis++;flag=1;
         }
@@ -127,7 +129,7 @@ int parentesis(char* pStringInicio){
     if(flag!=-1){
         char auxNumber[100]={""};
         char auxString[200]={""};
-        strncpy(auxString, pStringInicio,largoInicio-nParentesis);//printf("%s\n",auxString);
+        strncpy(auxString, pStringInicio,largoInicio);//printf("%s\n",auxString);
         output=calculoSimple(pInicio,largoParentesis);
         sprintf(auxNumber,"%.3f",output);
         strcat(auxString,auxNumber);//printf("%s\n",auxString);
@@ -141,5 +143,34 @@ void terminos(char* puntero){
     for(int i=0;i<200;i++){
 
     }
+}
+
+int isFloat(float num){
+    char* aux1;char* aux2;
+    char num1[30]={""};
+    char num2[30]={""};
+    aux1=&num1;aux2=&num2;
+    sprintf(aux1,"%f\n",num);
+    sprintf(aux2,"%.5f0\n",num);
+    if(strcmp(aux1,aux2)==0){
+        printf("%s %d\n",aux1,strcmp(aux1,aux2));
+        sprintf(aux1,"%.5f\n",num);
+        sprintf(aux2,"%.4f0\n",num);
+    }else if(strcmp(aux1,aux2)==0){
+        sprintf(aux1,"%.4f\n",num);
+        sprintf(aux2,"%.3f0\n",num);
+    }else if(strcmp(aux1,aux2)==0){
+        sprintf(aux1,"%.3f\n",num);
+        sprintf(aux2,"%.2f0\n",num);
+    }else if(strcmp(aux1,aux2)==0){
+        sprintf(aux1,"%.2f\n",num);
+        sprintf(aux2,"%.1f0\n",num);
+    }else if(strcmp(aux1,aux2)==0){
+        sprintf(aux1,"%.1f\n",num);
+        sprintf(aux2,"%.0f0\n",num);
+    }else if(strcmp(aux1,aux2)==0){
+        sprintf(aux1,"%.0f\n",num);
+    }
+    printf("j%s\n",aux1);
     return 0;
 }

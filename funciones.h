@@ -3,7 +3,7 @@
 
 int validar(char*);
 
-int potencia(int,int);
+float potencia(float,float);
 
 float calculoSimple(char*,int);
 
@@ -11,7 +11,7 @@ int parentesis(char*);
 
 void terminos(char*);
 
-
+int isFloat(float);
 
 
 
