@@ -9,7 +9,11 @@ int validar(char*);
 
 float potencia(float,float);
 
-float calculoSimple(char*,int);
+double *seteadorNumeros(char*,int);
+
+void insertNumberInString(char*,int,double,char*);
+
+double calculoSimple(char*,int);
 
 int parentesis(char*);
 

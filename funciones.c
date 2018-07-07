@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #define TAM 1000
-#define ESC 27
 #define F1 59
+#define ESC 27
+#define Enter 13
 #define Atras 8
+#define BIP 7
 
 char menu(){
     char seguir=0;
@@ -33,11 +35,12 @@ float potencia(float numero, float potencia){
     }return resultado;
 }
 
-double calculoSimple(char* puntero,int largo){
+double* seteadorNumeros(char* puntero,int largo){
     int negativeFlag=0,numFlag=0,floatFlag=0;
-    int numCounter=0,floatConter=0;
-    double aux, auxNums[50];
-    for(int i=0;i<=50;i++){auxNums[i]=0;}
+    int numCounter=1,floatConter=0;
+    double aux;
+    static double auxNums[50];
+    for(int i=0;i<50;i++){auxNums[i]=0;}
     for(int i=0;i<largo+1;i++){
         aux=*(puntero+i)-48;
         if(*(puntero+i)=='-'){                                             //marca negativos
@@ -71,49 +74,58 @@ double calculoSimple(char* puntero,int largo){
                     numFlag=0;floatFlag=0;
                 }
             }
-        }if(*(puntero+i)=='\0'){break;}
-    }
+        }
+    }auxNums[0]=numCounter;
+    return auxNums;
+}
+
+double calculoSimple(char* puntero,int largo){
+    double* pNumeros;
+    pNumeros=seteadorNumeros(puntero,largo);
+    //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
     double output=0;
-    for(int i=0;i<numCounter;i++){
-        //printf("Numero %d: %.2f\n",i+1,auxNums[i]);
-        output=output+auxNums[i];
+    for(int i=1;i<*(pNumeros+0);i++){
+        //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
+        output=output+*(pNumeros+i);
+    free(pNumeros);
     }return output;
 }
 
 int operacionCombinada(){
-    int continuar;
+    int continuar=0;
     do{
         char* pString;
         char input[TAM];
+        double output;
         pString=&input[0];
-        system("mode con cols=66 lines=11");
+        system("mode con cols=66 lines=40");
         printf("__________________________________________________________________\n");
         printf("\tIngrese la operaci%cn:\n\n ",162);
         fflush(stdin);
         gets(pString);
-        printf("__________________________________________________________________\n");
+        printf("__________________________________________________________________");
         if(validar(pString)<0)
-            {}
+            {printf("%c",BIP);}
         else if(validar(pString)>0){
-            system("mode con cols=63 lines=39");
+            system("cls");
             printf("__________________________________________________________________\n");
             int largo=strlen(pString);
             printf(" %s",pString);
             while(strchr(pString, '(')!=NULL){
                 parentesis(pString);
-                printf("\n %s",pString);
-            }
-            double output=calculoSimple(pString,largo);
+                largo=strlen(pString);
+                printf("\n\n %s",pString);
+            }output=calculoSimple(pString,largo);
             printf("=%0.2f\n\n",output);
-        }else
-            {printf("\t \\(o_o')/ %cy que se supone que haga?\n\n",168);}
-        printf("_______________________________________________________________\n");
+        }
+        else
+            {printf("\n\t \\(o_o')/ %cy que se supone que haga?\n\n",168);}
+        printf("__________________________________________________________________\n");
         printf("\tESC para salir - Retroceso para volver al menu\n");
         do{
             fflush(stdin);
             continuar=getch();
-            fflush(stdin);
-        }while(continuar==13);
+        }while(continuar!=ESC&&continuar!=Atras&&continuar==Enter);
     }while(continuar!=ESC&&continuar!=Atras);
     return continuar;
 }
@@ -159,25 +171,36 @@ int validar(char* puntero){
     return flag;
 }
 
+void insertNumberInString(char* puntero,int largoInicio,double number,char*pFin){
+    char auxNumber[50]={""};
+    char auxString[1000]={""};
+    strncpy(auxString, puntero,largoInicio);//printf("%s\n",auxString);
+    sprintf(auxNumber,"%.2f",number);
+    strcat(auxString,auxNumber);//printf("%s\n",auxString);
+    strcat(auxString,pFin);//printf("%s\n",auxString);
+    strcpy(puntero,auxString);
+}
+
 int parentesis(char* puntero){
     int index,flag=-1;
     int largoInicio=0,largoParentesis=0;
-    char* pInicio,* pFin;
-    float output;
+    char *pAux, *pInicio, *pFin;
+    double output;
     for(int i=0;i<TAM;i++){
-        index=*(puntero+i);
+        pAux=puntero+i;
+        index=*pAux;
         if(!flag){
             largoInicio++;
         }
         if(index==')'){
             flag=0;largoParentesis++;
-            pFin=(puntero+i);
+            pFin=pAux+1;
             break;
         }
         if(flag)
             {largoParentesis++;}
         if(index=='('){
-            pInicio=(puntero+i);
+            pInicio=pAux;
             if(flag){
                 largoInicio=largoInicio+largoParentesis-1;
                 largoParentesis=0;
@@ -185,28 +208,37 @@ int parentesis(char* puntero){
         }
     }
     if(flag!=-1){
-        char auxNumber[100]={""};
-        char auxString[200]={""};
-        strncpy(auxString, puntero,largoInicio);//printf("%s\n",auxString);
         output=calculoSimple(pInicio,largoParentesis);
-        sprintf(auxNumber,"%.2f",output);
-        strcat(auxString,auxNumber);//printf("%s\n",auxString);
-        strcat(auxString,pFin+1);//printf("%s\n",auxString);
-        strcpy(puntero,auxString);
+        insertNumberInString(puntero,largoInicio,output,pFin);
     }
     return flag;
 }
 
 void terminos(char* puntero){
-    char* pFin,* pInicio=puntero;
+    int index,flag=-1;
+    int largoInicio=0,largoTermino=0;
+    char *pAux, *pInicio=puntero, *pFin;
+    float output;
     for(int i=0;i<TAM;i++){
-        if(*(puntero+i)=='+'||*(puntero+i)=='-'){
-            if(*(puntero+i+1)=='+'||*(puntero+i+1)=='-'){
-                pFin=puntero+i;
+        pAux=puntero+i;
+        index=*pAux;
+        if(index=='+'||index=='-'){
+            if(largoTermino>0&&flag){
+                if(!(*(pAux-1)=='*'||*(pAux-1)=='/'||*(pAux-1)=='^')){
+                    pFin=pAux;
+                    break;
+                }largoTermino++;
+            }else if(!flag){
+                pInicio=pAux;
             }
         }
-
+        largoTermino++;
     }
+    if(flag!=-1){
+        //output=calculoSimple(pInicio,largoTermino);
+        insertNumberInString(puntero,largoInicio,output,pFin);
+    }
+    return flag;
 }
 
 int isFloat(float num){
