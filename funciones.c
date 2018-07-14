@@ -24,8 +24,8 @@ char menu(){
     return seguir;
 }
 
-float potencia(float numero, float potencia){
-    float resultado=1;
+double potencia(double numero, double potencia){
+    double resultado=1;
     if(potencia>0){
         for(int i=0;i<potencia;i++)
             {resultado=resultado*numero;}
@@ -75,7 +75,10 @@ double* seteadorNumeros(char* puntero,int largo){
                 }
             }
         }
-    }auxNums[0]=numCounter;
+    }auxNums[0]=numCounter-1;
+    /*for(int i=0;i<50;i++){
+        if(auxNums[i]!=0){printf("%f",auxNums[i]);}
+    }system("pause");*/
     return auxNums;
 }
 
@@ -84,10 +87,60 @@ double calculoSimple(char* puntero,int largo){
     pNumeros=seteadorNumeros(puntero,largo);
     //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
     double output=0;
-    for(int i=1;i<*(pNumeros+0);i++){
+    for(int i=1;i<=*(pNumeros+0);i++){
         //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
         output=output+*(pNumeros+i);
-    free(pNumeros);
+    }return output;
+}
+
+double calculoTermino(char* puntero,int largo){
+    double* pNumeros;
+    pNumeros=seteadorNumeros(puntero,largo);
+    //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
+    double output,numAux;
+    int flag=1;
+    char operador;
+    char *pAux2, *pAux1=puntero;
+    //printf("\n Numero %d: %.2f",1,*(pNumeros+1));
+    output=*(pNumeros+1);
+    for(int i=2;i<=*(pNumeros+0);i++){
+        if(flag){
+            pAux2=strchr(pAux1,'*');
+            if(pAux2!=NULL){
+                flag=0;
+                pAux1=pAux2+1;
+                operador='*';
+            }
+        }if(flag){
+            pAux2=strchr(pAux1,'/');
+            if(pAux2!=NULL){
+                flag=0;
+                pAux1=pAux2+1;
+                operador='/';
+            }
+        }if(flag){
+            pAux2=strchr(pAux1,'^');
+            if(pAux2!=NULL){
+                flag=0;
+                pAux1=pAux2+1;
+                operador='^';
+            }
+        }
+        //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
+        numAux=*(pNumeros+i);
+        if(flag==0){
+            if(operador=='*'){
+                //printf("\n %.0f*%.0f",output,numAux);
+                output=output*numAux;
+            }if(operador=='/'){
+                //printf("\n %.0f/%.0f",output,numAux);
+                output=output/numAux;
+            }if(operador=='^'){
+                //printf("\n %.0f/%.0f",output,numAux);
+                output=potencia(output,numAux);
+            }flag=-1;
+            //printf("=%.0f",output);
+        }
     }return output;
 }
 
@@ -109,13 +162,16 @@ int operacionCombinada(){
         else if(validar(pString)>0){
             system("cls");
             printf("__________________________________________________________________\n");
-            int largo=strlen(pString);
+            int largo;
             printf(" %s",pString);
             while(strchr(pString, '(')!=NULL){
                 parentesis(pString);
-                largo=strlen(pString);
                 printf("\n\n %s",pString);
-            }output=calculoSimple(pString,largo);
+            }while(strchr(pString, '*')!=NULL||strchr(pString, '/')!=NULL||strchr(pString, '^')!=NULL){
+                terminos(pString);
+                printf("\n\n %s",pString);
+            }largo=strlen(pString);
+            output=calculoSimple(pString,largo);
             printf("=%0.2f\n\n",output);
         }
         else
@@ -153,7 +209,7 @@ int validar(char* puntero){
                 }else{printf(", \"%c%c\"",*(puntero+i-1),index);}
             }
         }else{errorSintax=0;}
-        if(!(index>39&&index<58)){      // todo lo q no sea ()*+,-./0123456789
+        if(!(index>='('&&index<='9')&&index!='^'){      // todo lo q no sea ()*+,-./0123456789
             if(index==' ')
                 {nada=1;continue;}
             if(flag!=-1){
@@ -174,39 +230,48 @@ int validar(char* puntero){
 void insertNumberInString(char* puntero,int largoInicio,double number,char*pFin){
     char auxNumber[50]={""};
     char auxString[1000]={""};
-    strncpy(auxString, puntero,largoInicio);//printf("%s\n",auxString);
+    strncpy(auxString, puntero,largoInicio);printf("\nstring%s\n",auxString);
     sprintf(auxNumber,"%.2f",number);
-    strcat(auxString,auxNumber);//printf("%s\n",auxString);
-    strcat(auxString,pFin);//printf("%s\n",auxString);
+    strcat(auxString,auxNumber);printf("\nstring%s\n",auxString);
+    strcat(auxString,pFin);printf("\nstring%s\n",auxString);
     strcpy(puntero,auxString);
 }
 
 int parentesis(char* puntero){
-    int index,flag=-1;
+    int index,flag=-1,flagTermino;
     int largoInicio=0,largoParentesis=0;
     char *pAux, *pInicio, *pFin;
     double output;
-    for(int i=0;i<TAM;i++){
-        pAux=puntero+i;
-        index=*pAux;
-        if(!flag){
-            largoInicio++;
+    //do{
+        flagTermino=0;
+        for(int i=0;i<TAM;i++){
+            pAux=puntero+i;
+            index=*pAux;
+            if(!flag){
+                largoInicio++;
+            }
+            if(index==')'){
+                flag=0;largoParentesis++;
+                pFin=pAux+1;
+                break;
+            }
+            if(flag)
+                {largoParentesis++;}
+            if(index=='('){
+                pInicio=pAux;
+                if(flag){
+                    largoInicio=largoInicio+largoParentesis-1;
+                    largoParentesis=0;
+                }largoParentesis++;flag=1;
+            }
+            if(index=='*'||index=='/'||index=='^'){flagTermino=1;}
         }
-        if(index==')'){
-            flag=0;largoParentesis++;
-            pFin=pAux+1;
-            break;
+        /*if(flagTermino){
+            system("pause");
+            terminos(pInicio+1);
+            printf("\n\n %s",puntero);
         }
-        if(flag)
-            {largoParentesis++;}
-        if(index=='('){
-            pInicio=pAux;
-            if(flag){
-                largoInicio=largoInicio+largoParentesis-1;
-                largoParentesis=0;
-            }largoParentesis++;flag=1;
-        }
-    }
+    }while(flagTermino);*/
     if(flag!=-1){
         output=calculoSimple(pInicio,largoParentesis);
         insertNumberInString(puntero,largoInicio,output,pFin);
@@ -214,7 +279,7 @@ int parentesis(char* puntero){
     return flag;
 }
 
-void terminos(char* puntero){
+int terminos(char* puntero){
     int index,flag=-1;
     int largoInicio=0,largoTermino=0;
     char *pAux, *pInicio=puntero, *pFin;
@@ -222,20 +287,32 @@ void terminos(char* puntero){
     for(int i=0;i<TAM;i++){
         pAux=puntero+i;
         index=*pAux;
+        largoTermino++;
         if(index=='+'||index=='-'){
-            if(largoTermino>0&&flag){
+            if(largoTermino>0&&flag==1){
                 if(!(*(pAux-1)=='*'||*(pAux-1)=='/'||*(pAux-1)=='^')){
                     pFin=pAux;
                     break;
-                }largoTermino++;
-            }else if(!flag){
-                pInicio=pAux;
+                }
+            }
+            if(largoTermino>0&&flag!=1){
+                largoInicio=largoInicio+largoTermino;
+                largoTermino=0;
+                pInicio=pAux+1;
             }
         }
-        largoTermino++;
+        if(index=='*'||index=='/'||index=='^')
+            {flag=1;}
+        if(index=='\0'){
+            pFin=pAux;
+            break;
+        }if(index==')'){
+            pFin=pAux;
+            break;
+        }
     }
     if(flag!=-1){
-        //output=calculoSimple(pInicio,largoTermino);
+        output=calculoTermino(pInicio,largoTermino);
         insertNumberInString(puntero,largoInicio,output,pFin);
     }
     return flag;

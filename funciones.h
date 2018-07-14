@@ -7,7 +7,7 @@ int operacionCombinada();
 
 int validar(char*);
 
-float potencia(float,float);
+double potencia(double,double);
 
 double *seteadorNumeros(char*,int);
 
@@ -17,7 +17,7 @@ double calculoSimple(char*,int);
 
 int parentesis(char*);
 
-void terminos(char*);
+int terminos(char*);
 
 int isFloat(float);
 
