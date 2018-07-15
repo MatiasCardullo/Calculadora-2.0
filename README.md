@@ -11,3 +11,4 @@ El programa toma una operacion combinada ingresada por el usuario y la resuelve.
 	- potencias ~y raices~.
 	- ~factoriales.~
 - Resuelve parentesis y separa en terminos.
+- ~Resuelve ecuaciones.~
