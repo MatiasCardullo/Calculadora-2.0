@@ -1,9 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
 #define ESC 27
 #define F1 59
+#include <stdio.h>
+#include <stdlib.h>
 #include "funciones.h"
 
 int main(){
@@ -15,7 +13,13 @@ int main(){
                 seguir=operacionCombinada();
                 break;
             case F1:
-                printf("ayuda\n");
+                system(CLEAN);
+                printf("________________________________________________________________________________\n");
+                printf("  Este progama resuelve cualquier operacion matematica que el usuario desee.\n\n");
+                printf("  Caracteres validos ()*+,-./0123456789^\n\n");
+                printf("  Use ESC para salir y Retroceso para volver al menu anterior\n");
+                printf("________________________________________________________________________________\n");
+                getch();
                 break;
             case ESC:
                 seguir=ESC;

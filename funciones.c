@@ -1,3 +1,4 @@
+#include <conio.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,18 +8,19 @@
 #define Enter 13
 #define Atras 8
 #define BIP 7
+#include "funciones.h"
 
 char menu(){
     char seguir=0;
-    system("mode con cols=48 lines=11");
-    printf("________________________________________________\n");
-    printf("\t\tF1 para ayuda\n");
-    printf("________________________________________________\n");
+    system(CLEAN);
+    printf("________________________________________________________________________________\n");
+    printf("\t\t\t\tF1 para ayuda\n");
+    printf("________________________________________________________________________________\n");
     printf("  1 - Realizar una operaci%cn combinada\n",162);
     printf("  2 - Realizar una ecuaci%cn\n",162);
-    printf("________________________________________________\n");
+    printf("________________________________________________________________________________\n");
     do{
-        fflush(stdin);
+        setbuf(stdin, NULL);
         seguir=getch();
     }while(seguir!=ESC&&seguir!=F1&&!(seguir>'0'&&seguir<'3'));
     return seguir;
@@ -145,23 +147,23 @@ double calculoTermino(char* puntero,int largo){
 }
 
 int operacionCombinada(){
-    int continuar=0;
+    int continuar;
     do{
         char* pString;
         char input[TAM];
         double output;
         pString=&input[0];
-        system("mode con cols=66 lines=40");
-        printf("__________________________________________________________________\n");
+        system(CLEAN);
+        printf("________________________________________________________________________________\n");
         printf("\tIngrese la operaci%cn:\n\n ",162);
-        fflush(stdin);
+        setbuf(stdin, NULL);
         gets(pString);
-        printf("__________________________________________________________________");
+        printf("________________________________________________________________________________\n");
         if(validar(pString)<0)
             {printf("%c",BIP);}
         else if(validar(pString)>0){
-            system("cls");
-            printf("__________________________________________________________________\n");
+            system(CLEAN);
+            printf("________________________________________________________________________________\n");
             int largo;
             printf(" %s",pString);
             while(strchr(pString, '(')!=NULL){
@@ -175,21 +177,24 @@ int operacionCombinada(){
             printf("=%0.2f\n\n",output);
         }
         else
-            {printf("\n\t \\(o_o')/ %cy que se supone que haga?\n\n",168);}
-        printf("__________________________________________________________________\n");
-        printf("\tESC para salir - Retroceso para volver al menu\n");
+            {printf("\n\t\t     \\(o_o')/ %cy que se supone que haga?\n\n",168);}
+        printf("________________________________________________________________________________\n");
+        printf("\t\t\tPulse espacio para continuar");
         do{
-            fflush(stdin);
+            setbuf(stdin, NULL);
+            continuar=0;
             continuar=getch();
-        }while(continuar!=ESC&&continuar!=Atras&&continuar==Enter);
+        }while(continuar!=' '&&continuar!=ESC&&continuar!=Atras);
     }while(continuar!=ESC&&continuar!=Atras);
     return continuar;
 }
 
 int validar(char* puntero){
-    int index,flag=1,flagParentesis=0,errorSintax=0,errorParentesis=0,nada=1;
+    int index,flag=1,flagParentesis=0,errorSintax=0,errorParentesis=0,errorMatematico=0,nada=1;
+    char *pAux;
     for(int i=0;i<TAM;i++){
-        index=*(puntero+i);
+        pAux=puntero+i;
+        index=*pAux;
         if(index=='\0')
             {break;}
         nada=0;
@@ -200,16 +205,18 @@ int validar(char* puntero){
                 {flagParentesis=1;}
             errorParentesis--;
         }
-        if(index=='*'||index=='/'){
+
+        if(index=='*'||index=='/'){                                // Errores de sintaxis
             errorSintax++;
             if(errorSintax>1){
                 if(flag!=-3){
-                    printf("\n Error de sintaxsis: \"%c%c\"",*(puntero+i-1),index);
+                    printf("\n Error de sintaxsis: \"%c%c\"",*(pAux-1),index);
                     flag=-3;
-                }else{printf(", \"%c%c\"",*(puntero+i-1),index);}
+                }else{printf(", \"%c%c\"",*(pAux-1),index);}
             }
         }else{errorSintax=0;}
-        if(!(index>='('&&index<='9')&&index!='^'){      // todo lo q no sea ()*+,-./0123456789
+
+        if(!(index>='('&&index<='9')&&index!='^'){      // todo lo q no sea ()*+,-./0123456789^
             if(index==' ')
                 {nada=1;continue;}
             if(flag!=-1){
@@ -230,20 +237,21 @@ int validar(char* puntero){
 void insertNumberInString(char* puntero,int largoInicio,double number,char*pFin){
     char auxNumber[50]={""};
     char auxString[1000]={""};
-    strncpy(auxString, puntero,largoInicio);printf("\nstring%s\n",auxString);
+    strncpy(auxString, puntero,largoInicio);//printf("\nstring%s\n",auxString);
     sprintf(auxNumber,"%.2f",number);
-    strcat(auxString,auxNumber);printf("\nstring%s\n",auxString);
-    strcat(auxString,pFin);printf("\nstring%s\n",auxString);
+    strcat(auxString,auxNumber);//printf("\nstring%s\n",auxString);
+    strcat(auxString,pFin);//printf("\nstring%s\n",auxString);
     strcpy(puntero,auxString);
 }
 
 int parentesis(char* puntero){
-    int index,flag=-1,flagTermino;
-    int largoInicio=0,largoParentesis=0;
+    int index,flag,flagTermino;
+    int largoInicio,largoParentesis;
     char *pAux, *pInicio, *pFin;
     double output;
-    //do{
-        flagTermino=0;
+    do{
+        largoInicio=0;largoParentesis=0;
+        flagTermino=0;flag=-1;
         for(int i=0;i<TAM;i++){
             pAux=puntero+i;
             index=*pAux;
@@ -255,23 +263,24 @@ int parentesis(char* puntero){
                 pFin=pAux+1;
                 break;
             }
-            if(flag)
-                {largoParentesis++;}
+            if(flag){
+                largoParentesis++;
+                if(index=='*'||index=='/'||index=='^')
+                    {flagTermino=1;}
+            }
             if(index=='('){
                 pInicio=pAux;
                 if(flag){
                     largoInicio=largoInicio+largoParentesis-1;
-                    largoParentesis=0;
+                    largoParentesis=0;flagTermino=0;
                 }largoParentesis++;flag=1;
             }
-            if(index=='*'||index=='/'||index=='^'){flagTermino=1;}
         }
-        /*if(flagTermino){
-            system("pause");
+        if(flagTermino==1){
             terminos(pInicio+1);
             printf("\n\n %s",puntero);
         }
-    }while(flagTermino);*/
+    }while(flagTermino!=0);
     if(flag!=-1){
         output=calculoSimple(pInicio,largoParentesis);
         insertNumberInString(puntero,largoInicio,output,pFin);
@@ -280,7 +289,7 @@ int parentesis(char* puntero){
 }
 
 int terminos(char* puntero){
-    int index,flag=-1;
+    int index,flag=0;
     int largoInicio=0,largoTermino=0;
     char *pAux, *pInicio=puntero, *pFin;
     float output;
@@ -289,24 +298,23 @@ int terminos(char* puntero){
         index=*pAux;
         largoTermino++;
         if(index=='+'||index=='-'){
-            if(largoTermino>0&&flag==1){
+            if(largoTermino>0&&flag){
                 if(!(*(pAux-1)=='*'||*(pAux-1)=='/'||*(pAux-1)=='^')){
                     pFin=pAux;
                     break;
                 }
             }
-            if(largoTermino>0&&flag!=1){
+            if(largoTermino>0&&!flag){
                 largoInicio=largoInicio+largoTermino;
                 largoTermino=0;
                 pInicio=pAux+1;
             }
         }
-        if(index=='*'||index=='/'||index=='^')
-            {flag=1;}
-        if(index=='\0'){
-            pFin=pAux;
-            break;
-        }if(index==')'){
+        if(index=='*'||index=='/'||index=='^'){
+            if(flag)
+                {pFin=pAux;break;}
+            flag=1;
+        }if(index=='\0'||index==')'){
             pFin=pAux;
             break;
         }
