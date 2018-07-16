@@ -1,5 +1,6 @@
 #ifndef FUNCIONES_H_INCLUDED
 #define FUNCIONES_H_INCLUDED
+
 #ifdef __linux__
 #define CLEAN "CLEAR"
 #endif
@@ -8,7 +9,7 @@
 #define CLEAN "CLS"
 #endif
 
-char menu();
+int menu();
 
 int operacionCombinada();
 

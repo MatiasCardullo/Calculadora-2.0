@@ -10,8 +10,8 @@
 #define BIP 7
 #include "funciones.h"
 
-char menu(){
-    char seguir=0;
+int menu(){
+    int seguir=0;
     system(CLEAN);
     printf("________________________________________________________________________________\n");
     printf("\t\t\t\tF1 para ayuda\n");
@@ -100,37 +100,20 @@ double calculoTermino(char* puntero,int largo){
     pNumeros=seteadorNumeros(puntero,largo);
     //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
     double output,numAux;
-    int flag=1;
-    char operador;
-    char *pAux2, *pAux1=puntero;
+    int flag=1,index,operador;
+    char *pAux=puntero;
     //printf("\n Numero %d: %.2f",1,*(pNumeros+1));
     output=*(pNumeros+1);
     for(int i=2;i<=*(pNumeros+0);i++){
-        if(flag){
-            pAux2=strchr(pAux1,'*');
-            if(pAux2!=NULL){
-                flag=0;
-                pAux1=pAux2+1;
-                operador='*';
-            }
-        }if(flag){
-            pAux2=strchr(pAux1,'/');
-            if(pAux2!=NULL){
-                flag=0;
-                pAux1=pAux2+1;
-                operador='/';
-            }
-        }if(flag){
-            pAux2=strchr(pAux1,'^');
-            if(pAux2!=NULL){
-                flag=0;
-                pAux1=pAux2+1;
-                operador='^';
+        for(int j=0;j<largo;j++){
+            index=*(pAux+j);
+            if(index=='*'||index=='/'||index=='^'){
+                operador=index;
+                break;
             }
         }
         //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
         numAux=*(pNumeros+i);
-        if(flag==0){
             if(operador=='*'){
                 //printf("\n %.0f*%.0f",output,numAux);
                 output=output*numAux;
@@ -138,11 +121,10 @@ double calculoTermino(char* puntero,int largo){
                 //printf("\n %.0f/%.0f",output,numAux);
                 output=output/numAux;
             }if(operador=='^'){
-                //printf("\n %.0f/%.0f",output,numAux);
+                //printf("\n %.0f^%.0f",output,numAux);
                 output=potencia(output,numAux);
-            }flag=-1;
-            //printf("=%.0f",output);
-        }
+            }flag=1;
+            //printf("=%.0f\n",output);
     }return output;
 }
 

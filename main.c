@@ -1,7 +1,5 @@
 #define ESC 27
 #define F1 59
-#include <stdio.h>
-#include <stdlib.h>
 #include "funciones.h"
 
 int main(){
