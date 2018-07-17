@@ -10,7 +10,10 @@ int main(){
             case '1':
                 seguir=operacionCombinada();
                 break;
-            case F1:
+            case '2':
+                seguir=ecuacion();
+                break;
+            case F1: case 'h': case 'H':
                 system(CLEAN);
                 printf("________________________________________________________________________________\n");
                 printf("  Este progama resuelve cualquier operacion matematica que el usuario desee.\n\n");

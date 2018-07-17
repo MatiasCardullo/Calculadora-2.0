@@ -14,7 +14,7 @@ int menu(){
     int seguir=0;
     system(CLEAN);
     printf("________________________________________________________________________________\n");
-    printf("\t\t\t\tF1 para ayuda\n");
+    printf("\t\t\t\tF1 o H para ayuda\n");
     printf("________________________________________________________________________________\n");
     printf("  1 - Realizar una operaci%cn combinada\n",162);
     printf("  2 - Realizar una ecuaci%cn\n",162);
@@ -22,110 +22,8 @@ int menu(){
     do{
         setbuf(stdin, NULL);
         seguir=getch();
-    }while(seguir!=ESC&&seguir!=F1&&!(seguir>'0'&&seguir<'3'));
+    }while(seguir!=ESC&&seguir!=F1&&seguir!='h'&&seguir!='H'&&!(seguir>'0'&&seguir<'3'));
     return seguir;
-}
-
-double potencia(double numero, double potencia){
-    double resultado=1;
-    if(potencia>0){
-        for(int i=0;i<potencia;i++)
-            {resultado=resultado*numero;}
-    }else if(potencia<0){
-        for(int i=0;i<potencia;i++)
-            {resultado=resultado/numero;}
-    }return resultado;
-}
-
-double* seteadorNumeros(char* puntero,int largo){
-    int negativeFlag=0,numFlag=0,floatFlag=0;
-    int numCounter=1,floatConter=0;
-    double aux;
-    static double auxNums[50];
-    for(int i=0;i<50;i++){auxNums[i]=0;}
-    for(int i=0;i<largo+1;i++){
-        aux=*(puntero+i)-48;
-        if(*(puntero+i)=='-'){                                             //marca negativos
-            if(negativeFlag&&numFlag){
-                auxNums[numCounter]=0-auxNums[numCounter];
-                numCounter++;
-                numFlag=0;floatFlag=0;
-            }else if(!negativeFlag&&numFlag){
-                numCounter++;negativeFlag=1;
-                numFlag=0;floatFlag=0;
-            }else if(!negativeFlag&&!numFlag){
-                negativeFlag=1;
-            }else{negativeFlag=0;}
-        }
-        else{
-            if(aux>=0&&aux<=9){                                        //toma numeros
-                if(floatFlag){
-                    auxNums[numCounter]=auxNums[numCounter]+aux/potencia(10,floatConter);
-                    floatConter++;
-                }else{
-                    auxNums[numCounter]=auxNums[numCounter]*10+aux;
-                }numFlag=1;
-            }else if(*(puntero+i)=='.'||*(puntero+i)==','){     //marca decimales
-                floatFlag=1;floatConter=1;
-            }else{                                                        //setea negativos y numeros
-                if(negativeFlag&&numFlag){
-                    auxNums[numCounter]=0-auxNums[numCounter];
-                    negativeFlag=0;
-                }if(numFlag){
-                    numCounter++;
-                    numFlag=0;floatFlag=0;
-                }
-            }
-        }
-    }auxNums[0]=numCounter-1;
-    /*for(int i=0;i<50;i++){
-        if(auxNums[i]!=0){printf("%f",auxNums[i]);}
-    }system("pause");*/
-    return auxNums;
-}
-
-double calculoSimple(char* puntero,int largo){
-    double* pNumeros;
-    pNumeros=seteadorNumeros(puntero,largo);
-    //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
-    double output=0;
-    for(int i=1;i<=*(pNumeros+0);i++){
-        //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
-        output=output+*(pNumeros+i);
-    }return output;
-}
-
-double calculoTermino(char* puntero,int largo){
-    double* pNumeros;
-    pNumeros=seteadorNumeros(puntero,largo);
-    //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
-    double output,numAux;
-    int flag=1,index,operador;
-    char *pAux=puntero;
-    //printf("\n Numero %d: %.2f",1,*(pNumeros+1));
-    output=*(pNumeros+1);
-    for(int i=2;i<=*(pNumeros+0);i++){
-        for(int j=0;j<largo;j++){
-            index=*(pAux+j);
-            if(index=='*'||index=='/'||index=='^'){
-                operador=index;
-                break;
-            }
-        }
-        //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
-        numAux=*(pNumeros+i);
-            if(operador=='*'){
-                //printf("\n %.0f*%.0f",output,numAux);
-                output=output*numAux;
-            }if(operador=='/'){
-                //printf("\n %.0f/%.0f",output,numAux);
-                output=output/numAux;
-            }if(operador=='^'){
-                //printf("\n %.0f^%.0f",output,numAux);
-                output=potencia(output,numAux);
-            }flag=1;
-            //printf("=%.0f\n",output);
-    }return output;
 }
 
 int operacionCombinada(){
@@ -172,7 +70,7 @@ int operacionCombinada(){
 }
 
 int validar(char* puntero){
-    int index,flag=1,flagParentesis=0,errorSintax=0,errorParentesis=0,errorMatematico=0,nada=1;
+    int index,flag=1,flagErrorParentesis=0,errorSintax=0,errorParentesis=0,nada=1;
     char *pAux;
     for(int i=0;i<TAM;i++){
         pAux=puntero+i;
@@ -184,10 +82,9 @@ int validar(char* puntero){
             errorParentesis++;
         }if(index==')'){
             if(errorParentesis<=0)
-                {flagParentesis=1;}
+                {flagErrorParentesis=1;}
             errorParentesis--;
         }
-
         if(index=='*'||index=='/'){                                // Errores de sintaxis
             errorSintax++;
             if(errorSintax>1){
@@ -207,7 +104,7 @@ int validar(char* puntero){
             }else{printf(", %c",index);}
         }
     }
-    if(errorParentesis!=0||flagParentesis)
+    if(errorParentesis!=0||flagErrorParentesis)
             {printf("\n Error, faltan o sobran parentesis");flag=-2;}
     if(flag<0)
         {printf("\n");}
@@ -216,9 +113,56 @@ int validar(char* puntero){
     return flag;
 }
 
+double* numbersSetter(char* puntero,int largo){
+    int negativeFlag=0,numFlag=0,floatFlag=0;
+    int numCounter=1,floatConter=0;
+    double aux;
+    static double auxNums[50];
+    for(int i=0;i<50;i++){auxNums[i]=0;}
+    for(int i=0;i<largo+1;i++){
+        aux=*(puntero+i)-48;
+        if(*(puntero+i)=='-'){                                             //marca negativos
+            if(negativeFlag&&numFlag){
+                auxNums[numCounter]=0-auxNums[numCounter];
+                numCounter++;
+                numFlag=0;floatFlag=0;
+            }else if(!negativeFlag&&numFlag){
+                numCounter++;negativeFlag=1;
+                numFlag=0;floatFlag=0;
+            }else if(!negativeFlag&&!numFlag){
+                negativeFlag=1;
+            }else{negativeFlag=0;}
+        }
+        else{
+            if(aux>=0&&aux<=9){                                        //toma numeros
+                if(floatFlag){
+                    auxNums[numCounter]=auxNums[numCounter]+aux/potencia(10,floatConter);
+                    floatConter++;
+                }else{
+                    auxNums[numCounter]=auxNums[numCounter]*10+aux;
+                }numFlag=1;
+            }else if(*(puntero+i)=='.'||*(puntero+i)==','){     //marca decimales
+                floatFlag=1;floatConter=1;
+            }else{                                                        //setea negativos y numeros
+                if(negativeFlag&&numFlag){
+                    auxNums[numCounter]=0-auxNums[numCounter];
+                    negativeFlag=0;
+                }if(numFlag){
+                    numCounter++;
+                    numFlag=0;floatFlag=0;
+                }
+            }
+        }
+    }auxNums[0]=numCounter-1;
+    /*for(int i=0;i<50;i++){
+        if(auxNums[i]!=0){printf("%f",auxNums[i]);}
+    }system("pause");*/
+    return auxNums;
+}
+
 void insertNumberInString(char* puntero,int largoInicio,double number,char*pFin){
     char auxNumber[50]={""};
-    char auxString[1000]={""};
+    char auxString[TAM]={""};
     strncpy(auxString, puntero,largoInicio);//printf("\nstring%s\n",auxString);
     sprintf(auxNumber,"%.2f",number);
     strcat(auxString,auxNumber);//printf("\nstring%s\n",auxString);
@@ -258,7 +202,7 @@ int parentesis(char* puntero){
                 }largoParentesis++;flag=1;
             }
         }
-        if(flagTermino==1){
+        if(flagTermino==1&&flag!=-1){
             terminos(pInicio+1);
             printf("\n\n %s",puntero);
         }
@@ -296,19 +240,75 @@ int terminos(char* puntero){
             if(flag)
                 {pFin=pAux;break;}
             flag=1;
-        }if(index=='\0'||index==')'){
+        }if(index=='\0'||index==')'||index==')'){
             pFin=pAux;
             break;
         }
     }
-    if(flag!=-1){
+    if(flag!=0){
         output=calculoTermino(pInicio,largoTermino);
         insertNumberInString(puntero,largoInicio,output,pFin);
     }
     return flag;
 }
 
-int isFloat(float num){
+double calculoSimple(char* puntero,int largo){
+    double* pNumeros;
+    pNumeros=numbersSetter(puntero,largo);
+    //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
+    double output=0;
+    for(int i=1;i<=*(pNumeros+0);i++){
+        //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
+        output=output+*(pNumeros+i);
+    }return output;
+}
+
+double calculoTermino(char* puntero,int largo){
+    double* pNumeros;
+    pNumeros=numbersSetter(puntero,largo);
+    //printf("\nCantidad de numeros: %.0f",*(pNumeros+0));
+    double output,numAux;
+    int index,operador;
+    char *pAux=puntero;
+    //printf("\n Numero %d: %.2f",1,*(pNumeros+1));
+    output=*(pNumeros+1);
+    for(int i=2;i<=*(pNumeros+0);i++){
+        for(int j=0;j<largo;j++){
+            index=*(pAux+j);
+            if(index=='*'||index=='/'||index=='^'){
+                operador=index;
+                pAux=pAux+j+1;
+                break;
+            }
+        }
+        //printf("\n Numero %d: %.2f",i,*(pNumeros+i));
+        numAux=*(pNumeros+i);
+            if(operador=='*'){
+                //printf("\n %.0f*%.0f",output,numAux);
+                output=output*numAux;
+            }if(operador=='/'){
+                //printf("\n %.0f/%.0f",output,numAux);
+                output=output/numAux;
+            }if(operador=='^'){
+                //printf("\n %.0f^%.0f",output,numAux);
+                output=potencia(output,numAux);
+            }
+            //printf("=%.0f\n",output);
+    }return output;
+}
+
+double potencia(double numero, double potencia){
+    double resultado=1;
+    if(potencia>0){
+        for(int i=0;i<potencia;i++)
+            {resultado=resultado*numero;}
+    }else if(potencia<0){
+        for(int i=0;i<potencia;i++)
+            {resultado=resultado/numero;}
+    }return resultado;
+}
+
+/*int isFloat(float num){
     char* aux1;char* aux2;
     char num1[30]={""};
     char num2[30]={""};
@@ -336,4 +336,4 @@ int isFloat(float num){
     }
     printf("j%s\n",aux1);
     return 0;
-}
+}*/
