@@ -1,13 +1,3 @@
-#include <conio.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#define TAM 1000
-#define F1 59
-#define ESC 27
-#define Enter 13
-#define Atras 8
-#define BIP 7
 #include "funciones.h"
 
 int menu(){
@@ -32,12 +22,12 @@ int operacionCombinada(){
         char* pString;
         char input[TAM];
         double output;
-        pString=&input[0];
+        pString=&input;
         system(CLEAN);
         printf("________________________________________________________________________________\n");
         printf("\tIngrese la operaci%cn:\n\n ",162);
         setbuf(stdin, NULL);
-        gets(pString);
+        getString(TAM,pString);
         printf("________________________________________________________________________________\n");
         if(validar(pString)<0)
             {printf("%c",BIP);}
@@ -59,13 +49,13 @@ int operacionCombinada(){
         else
             {printf("\n\t\t     \\(o_o')/ %cy que se supone que haga?\n\n",168);}
         printf("________________________________________________________________________________\n");
-        printf("\t\t\tPulse espacio para continuar");
+        printf("\t\t\tPulse espacio para continuar\n");
         do{
             setbuf(stdin, NULL);
             continuar=0;
             continuar=getch();
-        }while(continuar!=' '&&continuar!=ESC&&continuar!=Atras);
-    }while(continuar!=ESC&&continuar!=Atras);
+        }while(continuar!=' '&&continuar!=ESC&&continuar!=Atras&&continuar!='B'&&continuar!='b');
+    }while(continuar!=ESC&&continuar!=Atras&&continuar!='B'&&continuar!='b');
     return continuar;
 }
 
@@ -78,14 +68,15 @@ int validar(char* puntero){
         if(index=='\0')
             {break;}
         nada=0;
-        if(index=='('){
+        if(index=='('){                                                         // Verifica los parentesis
             errorParentesis++;
-        }if(index==')'){
+        }
+        if(index==')'){
             if(errorParentesis<=0)
                 {flagErrorParentesis=1;}
             errorParentesis--;
         }
-        if(index=='*'||index=='/'){                                // Errores de sintaxis
+        if(index=='*'||index=='/'){                                         // Errores de sintaxis
             errorSintax++;
             if(errorSintax>1){
                 if(flag!=-3){
@@ -171,7 +162,7 @@ void insertNumberInString(char* puntero,int largoInicio,double number,char*pFin)
 }
 
 int parentesis(char* puntero){
-    int index,flag,flagTermino;
+    short index,flag,flagTermino;
     int largoInicio,largoParentesis;
     char *pAux, *pInicio, *pFin;
     double output;
@@ -298,14 +289,36 @@ double calculoTermino(char* puntero,int largo){
 }
 
 double potencia(double numero, double potencia){
-    double resultado=1;
+    double resultado=1,aux;
+    int potenciaInt=potencia;
     if(potencia>0){
-        for(int i=0;i<potencia;i++)
-            {resultado=resultado*numero;}
+        for(int i=0;i<potencia;i++){
+            resultado=resultado*numero;
+            if(i==potenciaInt&&potenciaInt!=potencia){
+                aux=potencia-potenciaInt;
+                printf("%f",aux);system("pause");
+                resultado=resultado*(numero*aux);
+            }
+        }
     }else if(potencia<0){
-        for(int i=0;i<potencia;i++)
-            {resultado=resultado/numero;}
-    }return resultado;
+        for(int i=0;i<potencia;i++){
+            if(i!=potenciaInt){
+                resultado=resultado/numero;
+            }else if(potenciaInt!=potencia){
+                aux=potencia-potenciaInt;
+                resultado=resultado/(numero*aux);
+            }
+        }
+    }
+    return resultado;
+}
+
+char* getString(int large,char* aux){
+    setbuf(stdin,NULL);
+    fgets(aux,large,stdin);
+      if (aux[strlen(aux)-1] == '\n')
+      {aux[strlen(aux)-1] = '\0';}
+    return aux;
 }
 
 /*int isFloat(float num){

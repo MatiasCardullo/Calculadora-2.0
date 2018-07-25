@@ -1,6 +1,22 @@
 #ifndef FUNCIONES_H_INCLUDED
 #define FUNCIONES_H_INCLUDED
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define TAM 1000
+#define F1 59
+#define ESC 27
+#define Enter 13
+#define Atras 8
+#define BIP 7
+
+#include <conio.h>
+#ifndef	_CONIO_H_
+#define getch() getchar()
+#endif
+
 #ifdef __linux__
 #define CLEAN "CLEAR"
 #endif
@@ -25,7 +41,7 @@ int operacionCombinada();
  *
  * \param char*: String pointer
  * \param If have errors, it show in screen
- * \return int: A negative number if there is any error, 0 if the string has nothing and 1 if it is ok
+ * \return int: A negative number if there is any error, 0 if the string has nothing and 1 if it is OK
  */
 int validar(char*);
 
@@ -84,6 +100,8 @@ double calculoTermino(char*,int);
  * \return double: The result
  */
 double potencia(double,double);
+
+char* getString(int,char*);
 
 //int isFloat(float);
 
