@@ -2,7 +2,7 @@
 
 int main(){
     int seguir=0;
-    system("title ง Calculadora 2.0 ง");
+    system("title ยง Calculadora 2.0 ยง");
     while(seguir!=ESC){
         switch(menu()){
             case '1':
